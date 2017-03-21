@@ -1,0 +1,83 @@
+//
+//  CHIPP_SH_SDK.pch
+//  CH_IPP_SH_SDK
+//
+//  Created by Wu on 17/3/13.
+//  Copyright © 2017年 Wu. All rights reserved.
+//
+
+#ifndef CHIPP_SH_SDK_pch
+#define CHIPP_SH_SDK_pch
+
+// Include any system framework and library headers here that should be included in all compilation units.
+// You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
+
+// 偏好设置
+#define CH_USERDEFAULT [NSUserDefaults standardUserDefaults]
+
+// 整个屏幕的宽高
+#define CH_SCREEN_WIDTH ([UIScreen mainScreen].bounds.size.width)
+#define CH_SCREEN_HEIGHT ([UIScreen mainScreen].bounds.size.height)
+// 实际应用的宽高（除去状态栏）
+#define CH_APP_WIDTH ([UIScreen mainScreen].applicationFrame.size.width)
+#define CH_APP_HEIGHT ([UIScreen mainScreen].applicationFrame.size.height)
+// 状态栏和导航栏高度
+#define CH_STATUS_BAR_HEIGHT 20
+#define CH_NAVIGATION_BAR_HEIGHT 44
+
+// 沙盒路径
+#define CH_DOCUMENT_PATH [NSSearchPathForDirectoriesInDomains(NSDocumentationDirectory, NSUserDomainMask, YES) objectAtIndex:0]
+#define CH_TEMP_PATH NSTemporaryDirectory()
+#define CH_LIB_PATH [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0]
+
+// 系统版本 "4.0"
+// 因为转 CGFloat 有精度误差，所以如果想要支持 iOS 7 及以上，应该使用 CH_SYSTEM_VERSION > 6.x 来判断，而不应该使用 >=
+#define CH_SYSTEM_VERSION [[UIDevice currentDevice] systemVersion].floatValue
+// App delegate
+#define CH_APP_DELEGATE ((AppDelegate *)[[UIApplication sharedApplication] delegate])
+
+// 设备类型 iPhone  iPad  TV
+#define CH_IS_IPHONE [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone
+#define CH_IS_IPAD [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad
+#define CH_IS_TV [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomTV
+
+// GCD
+#define CH_BACK_DEFAULT_BLOCK(block) dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), block)
+#define CH_MAIN_BLOCK(block) dispatch_async(dispatch_get_main_queue(),block)
+
+// 控制打印
+#ifdef DEBUG
+// 重新定义 NSLog 宏，修改格式，去掉打印中的时间戳
+#define NSLog(FORMAT, ...) fprintf(stderr,"%s\n",[[NSString stringWithFormat:FORMAT, ##__VA_ARGS__] UTF8String])
+#define CHLog(fmt, ...) NSLog((@"\n\n\nFUNC: %s ---- [Line %d] \n" fmt),__func__, __LINE__, ##__VA_ARGS__)
+#else
+#define CHLog(fmt, ...)
+#endif
+
+// 单例声明
+#define CH_SINGLETON_H(name) + (id)default##name;
+// 单例实现
+#define CH_SINGLETON_M(name) \
++ (id) allocWithZone:(struct _NSZone *)zone { \
+static id s = nil; \
+static dispatch_once_t onceToken; \
+dispatch_once(&onceToken, ^{ \
+s = [[super allocWithZone:NULL] init]; \
+}); \
+return s; \
+} \
+- (id) copyWithZone:(NSZone *)zone { \
+return self; \
+} \
+- (id) mutableCopyWithZone:(NSZone *)zone { \
+return self; \
+} \
++ (id) default##name { \
+return [self allocWithZone:NULL]; \
+} \
+
+
+
+
+
+#endif /* CHIPP_SH_SDK_pch */
